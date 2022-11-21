@@ -19,7 +19,7 @@
 #include_next <mcuconf.h>
 
 #undef STM32_I2C_USE_I2C1
-#define STM32_I2C_USE_I2C1 TRUE
+#define STM32_I2C_USE_I2C1 FALSE
 
 #undef STM32_PWM_USE_TIM5
-#define STM32_PWM_USE_TIM5 TRUE
+#define STM32_PWM_USE_TIM5 FALSE

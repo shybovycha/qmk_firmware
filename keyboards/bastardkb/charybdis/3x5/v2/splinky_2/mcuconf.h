@@ -19,5 +19,8 @@
 
 #include_next <mcuconf.h>
 
-#undef RP_SPI_USE_SPI0
-#define RP_SPI_USE_SPI0 TRUE
+/* key matrix size */
+#define MATRIX_ROWS 4
+#define MATRIX_COLS 12
+
+#define DIODE_DIRECTION COL2ROW
