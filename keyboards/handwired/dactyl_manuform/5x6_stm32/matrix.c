@@ -181,16 +181,40 @@ static void init_rows(void) {
 }
 
 static void unselect_rows(void) {
-  GPIOA->BSRR = 0b1111111 << 8;
+  // GPIOA->BSRR = 0b1111111 << 8; // make all pins of port A to outputs
+  // *((volatile uint32_t *)&GPIOA->BSRRL) = ((uint32_t)GPIO_Pin_8); //set bit
+  // GPIOA->IDR // read port A
+  // GPIOA->ODR // write port A
+  // *((volatile uint32_t *)&GPIOA->BSRRL) = ((uint32_t)GPIO_Pin_8) << 16; //reset bit
+  palClearPad(GPIOA, 8);
+  palClearPad(GPIOA, 9);
+  palClearPad(GPIOA, 10);
+  palClearPad(GPIOA, 11);
+  palClearPad(GPIOA, 12);
+  palClearPad(GPIOA, 15);
+  // palSetPad(GPIOA, 8);
+
+
+  // uint8_t bits = 0x00;
+  // for (int colPins = 0; colPins < MATRIX_COLS; colPins++) {
+  //   bits ^= 0x01 << MATRIX_COLS(colPins);
+  // }
+  // pal_lld_writeport(GPIOA, bits);
 }
 
 static void select_row(uint8_t row) {
-  if (row < MATRIX_ROWS_PER_SIDE) {
-    // if (!mcp23017_status) {
-    //   uint8_t data = (0xFF & ~(1 << row));
-    //   mcp23017_status = i2c_writeReg(I2C_ADDR, I2C_GPIOA, &data, 1, 10);
-    // }
-  } else {
-    GPIOA->BRR = 0x1 << (row+1);
-  }
+  palSetPad(GPIOA, row);
+  // palClearPad(GPIOA, 9);
+  // palClearPad(GPIOA, 10);
+  // palClearPad(GPIOA, 11);
+  // palClearPad(GPIOA, 12);
+  // palClearPad(GPIOA, 15);
+  // if (row < MATRIX_ROWS_PER_SIDE) {
+  //   // if (!mcp23017_status) {
+  //   //   uint8_t data = (0xFF & ~(1 << row));
+  //   //   mcp23017_status = i2c_writeReg(I2C_ADDR, I2C_GPIOA, &data, 1, 10);
+  //   // }
+  // } else {
+  //   GPIOA->BSRR = 0x1 << (row+1);
+  // }
 }

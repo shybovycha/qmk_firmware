@@ -1,6 +1,6 @@
 # MCU name
 MCU = STM32F103
-MCU_LDSCRIPT = STM32F103x6_stm32duino_bootloader # stm32f103_bootloader
+MCU_LDSCRIPT = stm32f103_bootloader
 
 # Bootloader selection
 # BOARD = ST_NUCLEO64_F103RB
