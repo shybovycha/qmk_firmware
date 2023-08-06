@@ -19,21 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include_next <board.h>
 
-#ifdef STM32_LSECLK
-#undef STM32_LSECLK
-#endif // STM32_LSECLK
-#define STM32_LSECLK 32768
+// #ifdef STM32_LSECLK
+// #undef STM32_LSECLK
+// #endif // STM32_LSECLK
+// #define STM32_LSECLK 32768
 
-#ifdef STM32_HSECLK
-#undef STM32_HSECLK
-#endif // STM32_HSECLK
-#define STM32_HSECLK 8000000
+// #ifdef STM32_HSECLK
+// #undef STM32_HSECLK
+// #endif // STM32_HSECLK
+// #define STM32_HSECLK 8000000
 
-#undef VAL_GPIOACRL
-#define VAL_GPIOACRL 0x88888888
+// #undef VAL_GPIOACRL
+// #define VAL_GPIOACRL 0x88888888
 
-#undef VAL_GPIOAODR
-#define VAL_GPIOAODR 0xFFFFFFFF
+// #undef VAL_GPIOAODR
+// #define VAL_GPIOAODR 0xFFFFFFFF
 
-#undef VAL_GPIOCCRH
-#define VAL_GPIOCCRH 0x88888888
+// #undef VAL_GPIOCCRH
+// #define VAL_GPIOCCRH 0x88888888
