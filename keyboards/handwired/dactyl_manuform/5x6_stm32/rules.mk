@@ -26,9 +26,9 @@ COMMAND_ENABLE = no    # Commands for debug and configuration
 NKRO_ENABLE = yes           # Enable N-Key Rollover
 CUSTOM_MATRIX = yes # Custom matrix file
 UNICODE_ENABLE = yes # Unicode
-# SPLIT_KEYBOARD = yes
+SPLIT_KEYBOARD = yes
 
-# SPLIT_TRANSPORT = custom # https://github.com/qmk/qmk_firmware/blob/master/docs/config_options.md#split-keyboard-options
+SPLIT_TRANSPORT = custom # https://github.com/qmk/qmk_firmware/blob/master/docs/config_options.md#split-keyboard-options
 
 # Enter lower-power sleep mode when on the ChibiOS idle thread
 OPT_DEFS += -DCORTEX_ENABLE_WFI_IDLE=TRUE

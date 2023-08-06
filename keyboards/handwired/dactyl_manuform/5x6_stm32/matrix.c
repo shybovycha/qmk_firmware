@@ -38,6 +38,12 @@ __attribute__((weak)) void matrix_scan_kb(void) {
   matrix_scan_user();
 }
 
+void matrix_print(void) {}
+
+void transport_master_init(void) {}
+
+void transport_slave_init(void) {}
+
 void matrix_init(void) {
   // mcp23017_status = init_mcp23017();
 
