@@ -21,20 +21,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // WS2812 RGB LED strip input and number of LEDs
 // #define RGBLED_NUM 12
 
-#define USART1_REMAP
-#define USART2_REMAP
+// #define USART1_REMAP
+// #define USART2_REMAP
 
 // #define MATRIX_ROWS 14
 #define MATRIX_ROWS_PER_SIDE (MATRIX_ROWS / 2)
 // #define MATRIX_COLS 6
 
-/* key combination for command */
-#define IS_COMMAND() ( \
-    keyboard_report->mods == (MOD_BIT(KC_LCTL) | MOD_BIT(KC_RCTL)) || \
-    keyboard_report->mods == (MOD_BIT(KC_LSFT) | MOD_BIT(KC_RSFT)) \
-)
+// in col2row col is input, and row is output
+// #define SPLIT_HAND_MATRIX_GRID A10, A4
+// 68kohm
+#define SPLIT_HAND_PIN              B10
 
-// i2c_master driver config
-#define I2C1_CLOCK_SPEED 400000
-#define I2C1_DUTY_CYCLE FAST_DUTY_CYCLE_2
+/* connection */
+#define SERIAL_USART_FULL_DUPLEX   // Enable full duplex operation mode.
+#define SERIAL_USART_RX_PIN B7     // USART RX pin
+#define SERIAL_USART_TX_PIN B6     // USART TX pin
+
+#define SELECT_SOFT_SERIAL_SPEED 1 // or 0, 2, 3, 4, 5
+                                   //  0: 460800 baud
+                                   //  1: 230400 baud (default)
+                                   //  2: 115200 baud
+                                   //  3: 57600 baud
+                                   //  4: 38400 baud
+                                   //  5: 19200 baud
+#define SERIAL_USART_DRIVER SD1    // USART driver of TX and RX pin. default: SD1
+#define SERIAL_USART_TX_PAL_MODE 7 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 7
+#define SERIAL_USART_RX_PAL_MODE 7 // Pin "alternate function", see the respective datasheet for the appropriate values for your MCU. default: 7
+#define SERIAL_USART_TIMEOUT 20    // USART driver timeout. default 20
+
 
