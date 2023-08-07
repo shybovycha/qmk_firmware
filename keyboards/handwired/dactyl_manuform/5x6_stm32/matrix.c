@@ -32,11 +32,39 @@ __attribute__((weak)) void matrix_scan_kb(void) {
   matrix_scan_user();
 }
 
+static void init_cols(void) {
+  // "cols": ["A8", "A9", "A10", "A11", "A12", "A15"],
+  palSetPadMode(GPIOA, 8, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 9, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 10, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 11, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 12, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 15, PAL_MODE_INPUT_PULLUP);
+}
+
+static void init_rows(void) {
+  // "rows": ["A7", "A6", "A5", "A4", "A3", "A2"]
+  palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetPadMode(GPIOA, 4, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetPadMode(GPIOA, 2, PAL_MODE_OUTPUT_PUSHPULL);
+}
+
 void matrix_init(void) {
   // TODO: initialize hardware and global matrix state here
+  init_rows();
+  unselect_rows();
+  init_cols();
+
   for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
     raw_matrix[row] = 0x00;
     matrix[row] = 0x00;
+
+    for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+      debounce_matrix[row * MATRIX_COLS + col] = 0;
+    }
   }
 
   // Unless hardware debouncing - Init the configured debounce routine
@@ -44,6 +72,16 @@ void matrix_init(void) {
 
   // This *must* be called for correct keyboard behavior
   matrix_init_kb();
+}
+
+void matrix_power_up(void) {
+  init_rows();
+  unselect_rows();
+  init_cols();
+
+  for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+    matrix[row] = 0;
+  }
 }
 
 void unselect_rows(void) {
@@ -83,17 +121,18 @@ matrix_row_t debounce_mask(matrix_row_t rawcols, uint8_t row) {
 
   raw_matrix[row] = rawcols;
 
-  for (uint8_t i = 0; i < MATRIX_COLS; ++i) {
-    if (debounce_matrix[row * MATRIX_COLS + i]) {
-      --debounce_matrix[row * MATRIX_COLS + i];
+  for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+    if (debounce_matrix[row * MATRIX_COLS + col]) {
+      --debounce_matrix[row * MATRIX_COLS + col];
     } else {
-      result |= (1 << i);
+      result |= (1 << col);
     }
 
-    if (change & (1 << i)) {
-      debounce_matrix[row * MATRIX_COLS + i] = DEBOUNCE;
+    if (change & (1 << col)) {
+      debounce_matrix[row * MATRIX_COLS + col] = DEBOUNCE;
     }
   }
+
   return result;
 }
 
@@ -104,10 +143,7 @@ matrix_row_t read_cols(uint8_t row) {
   }
 
   uint16_t data = GPIOA->IDR;
-
-  // uint16_t colPinsMask = (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15);
-
-  uint16_t bits = (~data); // & colPinsMask;
+  uint16_t bits = (~data);
 
   matrix_row_t result = 0x00;
 
@@ -118,7 +154,7 @@ matrix_row_t read_cols(uint8_t row) {
   if (bits & (1 << 12)) result |= (1 << 4);
   if (bits & (1 << 15)) result |= (1 << 5);
 
-  return result;
+  return ~result;
 }
 
 matrix_row_t matrix_get_row(uint8_t row) {
