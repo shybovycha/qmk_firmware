@@ -18,6 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#define MATRIX_COLS 6
+#define MATRIX_ROWS 12
+
 #define MATRIX_ROWS_PER_SIDE (MATRIX_ROWS / 2)
 
 // in col2row col is input, and row is output

@@ -69,12 +69,19 @@ static void init_cols(void) {
 
 static void init_rows(void) {
   // "rows": ["A7", "A6", "A5", "A1", "A3", "A2"]
-  palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
-  palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
-  palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_PUSHPULL);
-  palSetPadMode(GPIOA, 1, PAL_MODE_OUTPUT_PUSHPULL);
-  palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);
-  palSetPadMode(GPIOA, 2, PAL_MODE_OUTPUT_PUSHPULL);
+  // palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
+  // palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+  // palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_PUSHPULL);
+  // palSetPadMode(GPIOA, 1, PAL_MODE_OUTPUT_PUSHPULL);
+  // palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);
+  // palSetPadMode(GPIOA, 2, PAL_MODE_OUTPUT_PUSHPULL);
+
+  palSetPadMode(GPIOA, 7, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 6, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 3, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_PULLUP);
 }
 
 void matrix_init(void) {
@@ -99,15 +106,15 @@ void matrix_init(void) {
   matrix_init_kb();
 }
 
-// void matrix_power_up(void) {
-//   init_rows();
-//   unselect_rows();
-//   init_cols();
+void matrix_power_up(void) {
+  init_rows();
+  unselect_rows();
+  init_cols();
 
-//   for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-//     matrix[row] = 0;
-//   }
-// }
+  for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+    matrix[row] = 0;
+  }
+}
 
 void unselect_rows(void) {
   // "rows": ["A7", "A6", "A5", "A1", "A3", "A2"]
@@ -119,34 +126,46 @@ void unselect_rows(void) {
   // (1 << 3) |
   // (1 << 2)) << 16;
 
+  // "rows": ["A7", "A6", "A5", "A1", "A3", "A2"]
   pal_lld_clearport(GPIOA, 7);
   pal_lld_clearport(GPIOA, 6);
   pal_lld_clearport(GPIOA, 5);
   pal_lld_clearport(GPIOA, 1);
   pal_lld_clearport(GPIOA, 3);
   pal_lld_clearport(GPIOA, 2);
+
+  palSetPadMode(GPIOA, 7, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 6, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 3, PAL_MODE_INPUT_PULLUP);
+  palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_PULLUP);
 }
 
 uint8_t matrix_scan(void) {
-  bool changed = false;
+  // bool changed = false;
 
-  for (uint8_t row = 0; row < MATRIX_ROWS_PER_SIDE; row++) {
+  for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
     select_row(row);
-    select_row(row + MATRIX_ROWS_PER_SIDE);
 
-    matrix[row] = debounce_read_cols(row);
-    matrix[row + MATRIX_ROWS_PER_SIDE] = debounce_read_cols(row + MATRIX_ROWS_PER_SIDE);
+    wait_us(50);
+
+    // matrix[row] = debounce_read_cols(row);
+    // matrix[row + MATRIX_ROWS_PER_SIDE] = debounce_read_cols(row + MATRIX_ROWS_PER_SIDE);
+
+    matrix[row] = read_cols(row);
+    // matrix[row + MATRIX_ROWS_PER_SIDE] = read_cols(row + MATRIX_ROWS_PER_SIDE);
 
     unselect_rows();
   }
 
   // Unless hardware debouncing - use the configured debounce routine
-  changed = debounce(raw_matrix, matrix, MATRIX_ROWS, changed);
+  // changed = debounce(raw_matrix, matrix, MATRIX_ROWS, changed);
 
   // This *must* be called for correct keyboard behavior
   matrix_scan_kb();
 
-  return changed;
+  return 1;
 }
 
 matrix_row_t debounce_mask(matrix_row_t rawcols, uint8_t row) {
@@ -183,12 +202,12 @@ matrix_row_t read_cols(uint8_t row) {
 
   matrix_row_t result = 0x00;
 
-  if (bitsB & (1 << 12)) result |= (1);
-  if (bitsB & (1 << 13)) result |= (1 << 1);
-  if (bitsB & (1 << 14)) result |= (1 << 2);
-  if (bitsB & (1 << 15)) result |= (1 << 3);
-  if (bitsA & (1 << 8)) result |= (1 << 4);
-  if (bitsA & (1 << 15)) result |= (1 << 5);
+  if (bitsB & (1 << 12)) result |= (1 << 5);
+  if (bitsB & (1 << 13)) result |= (1 << 4);
+  if (bitsB & (1 << 14)) result |= (1 << 3);
+  if (bitsB & (1 << 15)) result |= (1 << 2);
+  if (bitsA & (1 << 8)) result |= (1 << 1);
+  if (bitsA & (1 << 15)) result |= (1 << 0);
 
   return result;
 }
@@ -205,7 +224,7 @@ matrix_row_t debounce_read_cols(uint8_t row) {
   matrix_row_t mask = debounce_mask(cols, row);
 
   // debounce the row and return the result.
-  return (cols & mask) | (matrix[row] & ~mask);;
+  return (cols & mask) | (matrix[row] & ~mask);
 }
 
 static void select_row(uint8_t row) {
@@ -213,17 +232,29 @@ static void select_row(uint8_t row) {
   if (row < MATRIX_ROWS_PER_SIDE) {
     // send signal to the other half
   } else {
-    if (row == 0)
+    if (row == MATRIX_ROWS_PER_SIDE + 0) {
+      palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
       pal_lld_setport(GPIOA, 7); // GPIOA->BSRR = (uint32_t)(0x01 << 7);
-    else if (row == 1)
+    }
+    else if (row == MATRIX_ROWS_PER_SIDE + 1) {
+      palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
       pal_lld_setport(GPIOA, 6); // GPIOA->BSRR = (uint32_t)(0x01 << 6);
-    else if (row == 2)
+    }
+    else if (row == MATRIX_ROWS_PER_SIDE + 2) {
+      palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_PUSHPULL);
       pal_lld_setport(GPIOA, 5); // GPIOA->BSRR = (uint32_t)(0x01 << 5);
-    else if (row == 3)
+    }
+    else if (row == MATRIX_ROWS_PER_SIDE + 3) {
+      palSetPadMode(GPIOA, 1, PAL_MODE_OUTPUT_PUSHPULL);
       pal_lld_setport(GPIOA, 1); // GPIOA->BSRR = (uint32_t)(0x01 << 1);
-    else if (row == 4)
+    }
+    else if (row == MATRIX_ROWS_PER_SIDE + 4) {
+      palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);
       pal_lld_setport(GPIOA, 3); // GPIOA->BSRR = (uint32_t)(0x01 << 3);
-    else if (row == 5)
+    }
+    else if (row == MATRIX_ROWS_PER_SIDE + 5) {
+      palSetPadMode(GPIOA, 2, PAL_MODE_OUTPUT_PUSHPULL);
       pal_lld_setport(GPIOA, 2); // GPIOA->BSRR = (uint32_t)(0x01 << 2);
+    }
   }
 }
