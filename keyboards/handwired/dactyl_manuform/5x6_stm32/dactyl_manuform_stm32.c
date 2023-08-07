@@ -1,22 +1,23 @@
 #include "dactyl_manuform_stm32.h"
-#include "i2c_master.h"
+
+// #include "i2c_master.h"
 
 // volatile int mcp23017_status = 0x20;
 // uint8_t i2c_initializied = 0;
 
-void board_init(void) {
-    // AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
-}
+// void board_init(void) {
+//     // AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+// }
 
-void bootloader_jump(void) {
-    // This board doesn't use the "standard" stm32duino bootloader, and is resident in memory at the base location. All we can do here is reset.
-    // NVIC_SystemReset();
-}
+// void bootloader_jump(void) {
+//     // This board doesn't use the "standard" stm32duino bootloader, and is resident in memory at the base location. All we can do here is reset.
+//     // NVIC_SystemReset();
+// }
 
-void matrix_init_kb(void)
-{
-    matrix_init_user();
-}
+// void matrix_init_kb(void)
+// {
+//     matrix_init_user();
+// }
 
 // uint8_t init_mcp23017(void) {
 //     if (!i2c_initializied) {
