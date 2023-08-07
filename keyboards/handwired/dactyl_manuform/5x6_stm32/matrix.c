@@ -4,6 +4,10 @@
 #include "wait.h"
 #include "timer.h"
 
+#ifndef DEBOUNCE
+#define DEBOUNCE 10
+#endif
+
 matrix_row_t matrix[MATRIX_ROWS];
 matrix_row_t raw_matrix[MATRIX_ROWS];
 uint8_t debounce_matrix[MATRIX_ROWS * MATRIX_COLS];
@@ -38,15 +42,26 @@ void matrix_init(void) {
   matrix_init_kb();
 }
 
+void unselect_rows(void) {
+  GPIOA->ODR =
+    (1 << 9) |
+    (1 << 10) |
+    (1 << 11) |
+    (1 << 12) |
+    (1 << 15);
+}
+
 uint8_t matrix_scan(void) {
   bool changed = false;
 
-  for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+  for (uint8_t row = 0; row < MATRIX_ROWS_PER_SIDE; row++) {
     select_row(row);
+    select_row(row + MATRIX_ROWS_PER_SIDE);
 
-    wait_ms(2);
+    matrix[row] = debounce_read_cols(row);
+    matrix[row + MATRIX_ROWS_PER_SIDE] = debounce_read_cols(row + MATRIX_ROWS_PER_SIDE);
 
-    matrix[row] = read_cols(row);
+    unselect_rows();
   }
 
   // Unless hardware debouncing - use the configured debounce routine
@@ -58,18 +73,52 @@ uint8_t matrix_scan(void) {
   return changed;
 }
 
+matrix_row_t debounce_mask(matrix_row_t rawcols, uint8_t row) {
+  matrix_row_t result = 0;
+  matrix_row_t change = rawcols ^ raw_matrix[row];
+
+  raw_matrix[row] = rawcols;
+
+  for (uint8_t i = 0; i < MATRIX_COLS; ++i) {
+    if (debounce_matrix[row * MATRIX_COLS + i]) {
+      --debounce_matrix[row * MATRIX_COLS + i];
+    } else {
+      result |= (1 << i);
+    }
+
+    if (change & (1 << i)) {
+      debounce_matrix[row * MATRIX_COLS + i] = DEBOUNCE;
+    }
+  }
+  return result;
+}
+
 matrix_row_t read_cols(uint8_t row) {
   // "cols": ["A8", "A9", "A10", "A11", "A12", "A15"],
-  return (palReadPad(GPIOA, 8) << 0) |
-    (palReadPad(GPIOA, 9) << 1) |
-    (palReadPad(GPIOA, 10) << 2) |
-    (palReadPad(GPIOA, 11) << 3) |
-    (palReadPad(GPIOA, 12) << 4) |
-    (palReadPad(GPIOA, 15) << 5);
+  if (row < MATRIX_ROWS_PER_SIDE) {
+    return 0;
+  }
+
+  uint8_t data = GPIOA->IDR;
+
+  uint8_t colPinsMask = (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15);
+
+  return (~data) & colPinsMask;
 }
 
 matrix_row_t matrix_get_row(uint8_t row) {
   return matrix[row];
+}
+
+matrix_row_t debounce_read_cols(uint8_t row) {
+  // Read the row without debouncing filtering and store it for later usage.
+  matrix_row_t cols = read_cols(row);
+
+  // Get the Debounce mask.
+  matrix_row_t mask = debounce_mask(cols, row);
+
+  // debounce the row and return the result.
+  return (cols & mask) | (matrix[row] & ~mask);;
 }
 
 void matrix_print(void) {}
@@ -78,21 +127,15 @@ static void select_row(uint8_t row) {
   if (row < MATRIX_ROWS_PER_SIDE) {
     // send signal to the other half
   } else {
-    palClearPad(GPIOA, 9);
-    palClearPad(GPIOA, 10);
-    palClearPad(GPIOA, 11);
-    palClearPad(GPIOA, 12);
-    palClearPad(GPIOA, 15);
-
     if (row == 0)
-      palSetPad(GPIOA, 9);
+      GPIOA->ODR = (1 << 9);
     else if (row == 1)
-      palSetPad(GPIOA, 10);
+      GPIOA->ODR = (1 << 10);
     else if (row == 2)
-      palSetPad(GPIOA, 11);
+      GPIOA->ODR = (1 << 11);
     else if (row == 3)
-      palSetPad(GPIOA, 12);
+      GPIOA->ODR = (1 << 12);
     else if (row == 4)
-      palSetPad(GPIOA, 15);
+      GPIOA->ODR = (1 << 15);
   }
 }
