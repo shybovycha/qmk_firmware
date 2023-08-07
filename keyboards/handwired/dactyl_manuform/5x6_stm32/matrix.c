@@ -32,6 +32,28 @@ __attribute__((weak)) void matrix_scan_kb(void) {
   matrix_scan_user();
 }
 
+void matrix_print(void) {}
+
+/*
+# Initialization
+
+All col and row IO pins are configured as Input with pullups activated.
+In my schematic case those are Row0, Row1, Col0 and Col1.
+
+# Matrix scan
+
+For each IO row pin(Row0, then Row1):
+
+1. Configure row IO pin as output.
+2. Set row IO pin in a low state (0) so that it sinks current.
+3. Wait a little bit (QMK default is 30 microseconds).
+4. For each IO col pin (Col0, then Col1):
+  a. Read pin.
+  b. If it is high, that means that the switch is opened and that the current flows from the pullup to the col pin.
+  c. If it is low, that means that the switch is closed and that the current is sinked by the row pin, no current flows to the col pin.
+5. Configure back row IO pin as input with pullup.
+*/
+
 // "cols": ["B12", "B13", "B14", "B15", "A8", "A15"],
 // "rows": ["A7", "A6", "A5", "A1", "A3", "A2"]
 
@@ -89,13 +111,20 @@ void matrix_init(void) {
 
 void unselect_rows(void) {
   // "rows": ["A7", "A6", "A5", "A1", "A3", "A2"]
-  GPIOA->ODR = 0x00;
-    // (0 << 7) |
-    // (0 << 6) |
-    // (0 << 5) |
-    // (0 << 4) |
-    // (0 << 3) |
-    // (0 << 2);
+  // GPIOA->BSRR =
+  // ((1 << 7) |
+  // (1 << 6) |
+  // (1 << 5) |
+  // (1 << 4) |
+  // (1 << 3) |
+  // (1 << 2)) << 16;
+
+  pal_lld_clearport(GPIOA, 7);
+  pal_lld_clearport(GPIOA, 6);
+  pal_lld_clearport(GPIOA, 5);
+  pal_lld_clearport(GPIOA, 1);
+  pal_lld_clearport(GPIOA, 3);
+  pal_lld_clearport(GPIOA, 2);
 }
 
 uint8_t matrix_scan(void) {
@@ -161,7 +190,7 @@ matrix_row_t read_cols(uint8_t row) {
   if (bitsA & (1 << 8)) result |= (1 << 4);
   if (bitsA & (1 << 15)) result |= (1 << 5);
 
-  return ~result;
+  return result;
 }
 
 matrix_row_t matrix_get_row(uint8_t row) {
@@ -179,24 +208,22 @@ matrix_row_t debounce_read_cols(uint8_t row) {
   return (cols & mask) | (matrix[row] & ~mask);;
 }
 
-void matrix_print(void) {}
-
 static void select_row(uint8_t row) {
   // "rows": ["A7", "A6", "A5", "A1", "A3", "A2"]
   if (row < MATRIX_ROWS_PER_SIDE) {
     // send signal to the other half
   } else {
     if (row == 0)
-      GPIOA->ODR = ~(1 << 7);
+      pal_lld_setport(GPIOA, 7); // GPIOA->BSRR = (uint32_t)(0x01 << 7);
     else if (row == 1)
-      GPIOA->ODR = ~(1 << 6);
+      pal_lld_setport(GPIOA, 6); // GPIOA->BSRR = (uint32_t)(0x01 << 6);
     else if (row == 2)
-      GPIOA->ODR = ~(1 << 5);
+      pal_lld_setport(GPIOA, 5); // GPIOA->BSRR = (uint32_t)(0x01 << 5);
     else if (row == 3)
-      GPIOA->ODR = ~(1 << 1);
+      pal_lld_setport(GPIOA, 1); // GPIOA->BSRR = (uint32_t)(0x01 << 1);
     else if (row == 4)
-      GPIOA->ODR = ~(1 << 3);
+      pal_lld_setport(GPIOA, 3); // GPIOA->BSRR = (uint32_t)(0x01 << 3);
     else if (row == 5)
-      GPIOA->ODR = ~(1 << 2);
+      pal_lld_setport(GPIOA, 2); // GPIOA->BSRR = (uint32_t)(0x01 << 2);
   }
 }
