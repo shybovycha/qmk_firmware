@@ -18,15 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-// WS2812 RGB LED strip input and number of LEDs
-// #define RGBLED_NUM 12
-
-// #define USART1_REMAP
-// #define USART2_REMAP
-
-// #define MATRIX_ROWS 14
 #define MATRIX_ROWS_PER_SIDE (MATRIX_ROWS / 2)
-// #define MATRIX_COLS 6
 
 // in col2row col is input, and row is output
 // #define SPLIT_HAND_MATRIX_GRID A10, A4
