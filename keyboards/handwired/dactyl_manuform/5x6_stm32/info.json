@@ -11,7 +11,7 @@
     "diode_direction": "COL2ROW",
     "matrix_pins": {
         "cols": ["B12", "B13", "B14", "B15", "A8", "A15"],
-        "rows": ["A7", "A6", "A5", "A1", "A3", "A2"]
+        "rows": ["A7", "A6", "A5", "B3", "B4", "B5"]
     },
     "processor": "STM32F401",
     "bootloader": "stm32-dfu",
