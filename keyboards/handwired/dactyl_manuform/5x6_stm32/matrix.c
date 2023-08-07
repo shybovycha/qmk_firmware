@@ -16,6 +16,10 @@ static matrix_row_t read_cols(uint8_t row);
 
 static void select_row(uint8_t row);
 
+matrix_row_t debounce_read_cols(uint8_t row);
+
+void unselect_rows(void);
+
 __attribute__((weak)) void matrix_init_user(void) {}
 
 __attribute__((weak)) void matrix_scan_user(void) {}
@@ -99,11 +103,22 @@ matrix_row_t read_cols(uint8_t row) {
     return 0;
   }
 
-  uint8_t data = GPIOA->IDR;
+  uint16_t data = GPIOA->IDR;
 
-  uint8_t colPinsMask = (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15);
+  // uint16_t colPinsMask = (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15);
 
-  return (~data) & colPinsMask;
+  uint16_t bits = (~data); // & colPinsMask;
+
+  matrix_row_t result = 0x00;
+
+  if (bits & (1 << 8)) result |= (1);
+  if (bits & (1 << 9)) result |= (1 << 1);
+  if (bits & (1 << 10)) result |= (1 << 2);
+  if (bits & (1 << 11)) result |= (1 << 3);
+  if (bits & (1 << 12)) result |= (1 << 4);
+  if (bits & (1 << 15)) result |= (1 << 5);
+
+  return result;
 }
 
 matrix_row_t matrix_get_row(uint8_t row) {
