@@ -28,6 +28,8 @@ static void select_row(uint8_t row);
 
 static void init_rows(void);
 
+bool is_keyboard_left(void);
+
 __attribute__((weak)) void matrix_init_user(void) {}
 
 __attribute__((weak)) void matrix_scan_user(void) {}
@@ -132,24 +134,14 @@ void matrix_print(void) {
 }
 
 static matrix_row_t read_cols(uint8_t row) {
-  if (row >= MATRIX_ROWS_PER_SIDE) {
-    // uint8_t data = 0xFF;
-    // if (!mcp23017_status) {
-    //   uint8_t regAddr = I2C_GPIOB;
-    //   mcp23017_status = i2c_readReg(I2C_ADDR, regAddr, &data, 1, 10);
-    // }
-    // if (mcp23017_status) {
-    //   return 0;
-    // }
-    // return (~data) & 0x3F;
+  if ((is_keyboard_left() && row >= MATRIX_ROWS_PER_SIDE) || (!is_keyboard_left() && row < MATRIX_ROWS_PER_SIDE)) {
+    // read from usart
     return 0;
-  } else {
+  }
+
+  if (is_keyboard_left()) {
     // left:
     // "cols": ["B12", "B14", "B15", "A0", "A1", "A15"],
-    // right:
-    // "cols": ["B12", "B13", "B14", "B15", "A8", "A15"],
-    // both
-    // "rows": ["A7", "A6", "A5", "B3", "B4", "B5"]
     return
       ((palReadPad(GPIOB, 12) ? 0 : 1) << 5) |
       ((palReadPad(GPIOB, 14) ? 0 : 1) << 4) |
@@ -158,22 +150,40 @@ static matrix_row_t read_cols(uint8_t row) {
       ((palReadPad(GPIOA, 1) ? 0 : 1) << 1) |
       ((palReadPad(GPIOA, 15) ? 0 : 1) << 0)
     ;
+  } else {
+    // right:
+    // "cols": ["B12", "B13", "B14", "B15", "A8", "A15"],
+    return
+      ((palReadPad(GPIOB, 12) ? 0 : 1) << 5) |
+      ((palReadPad(GPIOB, 13) ? 0 : 1) << 4) |
+      ((palReadPad(GPIOB, 14) ? 0 : 1) << 3) |
+      ((palReadPad(GPIOB, 15) ? 0 : 1) << 2) |
+      ((palReadPad(GPIOA, 8) ? 0 : 1) << 1) |
+      ((palReadPad(GPIOA, 15) ? 0 : 1) << 0)
+    ;
   }
 }
 
 static void init_cols(void) {
-  // left:
-  // "cols": ["B12", "B14", "B15", "A0", "A1", "A15"],
-  // right:
-  // "cols": ["B12", "B13", "B14", "B15", "A8", "A15"],
-  // both
-  // "rows": ["A7", "A6", "A5", "B3", "B4", "B5"]
-  palSetPadMode(GPIOB, 12, PAL_MODE_INPUT_PULLUP);
-  palSetPadMode(GPIOB, 14, PAL_MODE_INPUT_PULLUP);
-  palSetPadMode(GPIOB, 15, PAL_MODE_INPUT_PULLUP);
-  palSetPadMode(GPIOA, 0, PAL_MODE_INPUT_PULLUP);
-  palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_PULLUP);
-  palSetPadMode(GPIOA, 15, PAL_MODE_INPUT_PULLUP);
+  if (is_keyboard_left()) {
+    // left:
+    // "cols": ["B12", "B14", "B15", "A0", "A1", "A15"],
+    palSetPadMode(GPIOB, 12, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 14, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 15, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOA, 0, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOA, 15, PAL_MODE_INPUT_PULLUP);
+  } else {
+    // right:
+    // "cols": ["B12", "B13", "B14", "B15", "A8", "A15"],
+    palSetPadMode(GPIOB, 12, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 13, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 14, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 15, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOA, 8, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOA, 15, PAL_MODE_INPUT_PULLUP);
+  }
 }
 
 static void init_rows(void) {
@@ -193,18 +203,43 @@ static void unselect_rows(void) {
 }
 
 static void select_row(uint8_t row) {
-  if (row >= MATRIX_ROWS_PER_SIDE) {
-    // if (!mcp23017_status) {
-    //   uint8_t data = (0xFF & ~(1 << row));
-    //   mcp23017_status = i2c_writeReg(I2C_ADDR, I2C_GPIOA, &data, 1, 10);
-    // }
-  } else {
+  // if (row >= MATRIX_ROWS_PER_SIDE) {
+  //   // if (!mcp23017_status) {
+  //   //   uint8_t data = (0xFF & ~(1 << row));
+  //   //   mcp23017_status = i2c_writeReg(I2C_ADDR, I2C_GPIOA, &data, 1, 10);
+  //   // }
+  // } else {
     // "rows": ["A7", "A6", "A5", "B3", "B4", "B5"]
+    // right half
+    if (row == MATRIX_ROWS_PER_SIDE + 0) palClearPad(GPIOA, 7);
+    if (row == MATRIX_ROWS_PER_SIDE + 1) palClearPad(GPIOA, 6);
+    if (row == MATRIX_ROWS_PER_SIDE + 2) palClearPad(GPIOA, 5);
+    if (row == MATRIX_ROWS_PER_SIDE + 3) palClearPad(GPIOB, 3);
+    if (row == MATRIX_ROWS_PER_SIDE + 4) palClearPad(GPIOB, 4);
+    if (row == MATRIX_ROWS_PER_SIDE + 5) palClearPad(GPIOB, 5);
+
+    // left half
     if (row == 0) palClearPad(GPIOA, 7);
     if (row == 1) palClearPad(GPIOA, 6);
     if (row == 2) palClearPad(GPIOA, 5);
     if (row == 3) palClearPad(GPIOB, 3);
     if (row == 4) palClearPad(GPIOB, 4);
     if (row == 5) palClearPad(GPIOB, 5);
+  // }
+}
+
+bool is_keyboard_left(void) {
+  static enum { UNKNOWN, LEFT, RIGHT } hand_side = UNKNOWN;
+
+  // only check once, as this is called often
+  if (hand_side == UNKNOWN) {
+    // #if defined(SPLIT_HAND_PIN)
+    // Test pin SPLIT_HAND_PIN for High/Low, if low it's right hand
+    // setPinInput(SPLIT_HAND_PIN);
+    // hand_side = readPin(SPLIT_HAND_PIN) ? LEFT : RIGHT;
+    palSetPadMode(GPIOB, 10, PAL_MODE_INPUT_PULLUP);
+    hand_side = palReadPad(GPIOB, 10) ? LEFT : RIGHT;
   }
+
+  return (hand_side == LEFT);
 }

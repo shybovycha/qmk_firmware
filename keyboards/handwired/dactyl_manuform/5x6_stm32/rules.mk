@@ -10,7 +10,7 @@ SPLIT_KEYBOARD = yes
 ENCODER_ENABLE = no
 OLED_ENABLE = no
 
-# SPLIT_TRANSPORT = custom # https://github.com/qmk/qmk_firmware/blob/master/docs/config_options.md#split-keyboard-options
 SERIAL_DRIVER = usart
+# DEBOUNCE_TYPE = asym_eager_defer_pk
 
 SRC += matrix.c

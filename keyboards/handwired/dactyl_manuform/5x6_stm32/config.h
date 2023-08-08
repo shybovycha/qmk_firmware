@@ -26,11 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // in col2row col is input, and row is output
 // #define SPLIT_HAND_MATRIX_GRID A10, A4
 // 68kohm
+// High -> left, Low -> right.
 #define SPLIT_HAND_PIN              B10
 
 /* connection */
-#define SERIAL_USART_FULL_DUPLEX   // Enable full duplex operation mode.
-#define SERIAL_USART_RX_PIN A10     // USART RX pin
+// #define SERIAL_USART_FULL_DUPLEX   // Enable full duplex operation mode.
+// #define SERIAL_USART_RX_PIN A10     // USART RX pin
 #define SERIAL_USART_TX_PIN A9     // USART TX pin
 
 #define SELECT_SOFT_SERIAL_SPEED 1 // or 0, 2, 3, 4, 5
