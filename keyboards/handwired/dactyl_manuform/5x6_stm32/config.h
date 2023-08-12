@@ -28,11 +28,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 68kohm
 // High -> left, Low -> right.
 #define SPLIT_HAND_PIN              B10
+#define MASTER_RIGHT
 
 /* connection */
 // #define SERIAL_USART_FULL_DUPLEX   // Enable full duplex operation mode.
+#undef SERIAL_USART_FULL_DUPLEX   // Enable half-duplex operation mode.
+
 // #define SERIAL_USART_RX_PIN A10     // USART RX pin
-#define SERIAL_USART_TX_PIN A9     // USART TX pin
+#define SERIAL_USART_TX_PIN B6     // USART TX pin
 
 #define SELECT_SOFT_SERIAL_SPEED 1 // or 0, 2, 3, 4, 5
                                    //  0: 460800 baud
