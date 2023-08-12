@@ -10,8 +10,17 @@
     },
     "diode_direction": "COL2ROW",
     "matrix_pins": {
-        "cols": ["B12", "B14", "B15", "A0", "A1", "A15"],
+        "cols": ["A15", "A1", "A0", "B15", "B14", "B12"],
         "rows": ["A7", "A6", "A5", "B3", "B4", "B5"]
+    },
+    "split": {
+        "enabled": true,
+        "matrix_pins": {
+            "right": {
+                "cols": ["A15", "A8", "B15", "B14", "B13", "B12"],
+                "rows": ["A7", "A6", "A5", "B3", "B4", "B5"]
+            }
+        }
     },
     "processor": "STM32F401",
     "bootloader": "stm32-dfu",

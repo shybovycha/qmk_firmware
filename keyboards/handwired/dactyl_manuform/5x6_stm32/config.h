@@ -18,17 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#define MATRIX_COLS 6
-#define MATRIX_ROWS 12
+// #define MATRIX_COLS 6
+// #define MATRIX_ROWS 12
 
-#define MATRIX_ROWS_PER_SIDE (MATRIX_ROWS / 2)
+// #define MATRIX_ROWS_PER_SIDE (MATRIX_ROWS / 2)
 
 // in col2row col is input, and row is output
 // #define SPLIT_HAND_MATRIX_GRID A10, A4
 // 68kohm
 // High -> left, Low -> right.
 #define SPLIT_HAND_PIN              B10
-#define MASTER_RIGHT
+// #define	SPLIT_HAND_PIN_LOW_IS_LEFT
+
+// #define MASTER_RIGHT
 
 /* connection */
 // #define SERIAL_USART_FULL_DUPLEX   // Enable full duplex operation mode.
