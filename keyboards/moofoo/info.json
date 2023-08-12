@@ -14,8 +14,8 @@
         "split": true
     },
     "matrix_pins": {
-        "cols": ["C1", "C2", "C3", "C4", "C5", "C6"],
-        "rows": ["D1", "D2", "D3", "D4", "D5", "D6"]
+        "rows": ["A7", "A6", "A5", "B3", "B4", "B5"],
+        "cols": ["B12", "B14", "B15", "A0", "A1", "A15"]
     },
     "matrix_size": {
         "rows": 12,
