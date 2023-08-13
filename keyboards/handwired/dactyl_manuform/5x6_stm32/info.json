@@ -8,6 +8,17 @@
         "pid": "0x1308",
         "device_version": "0.0.1"
     },
+    "features": {
+        "extrakey": true,
+        "console": true,
+        "command": true,
+        "nkro": true,
+        "bootmagic": false,
+        "mousekey": false,
+        "unicode": true,
+        "encoder": false,
+        "oled":false
+    },
     "diode_direction": "COL2ROW",
     "matrix_pins": {
         "cols": ["A15", "A1", "A0", "B15", "B14", "B12"],
