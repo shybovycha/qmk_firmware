@@ -84,9 +84,9 @@ Variants with *Miryoku* support:
 
 ### @shybovycha Miryoku
 
-This is a slight variation on the original Miryoku, adopted for Colemak and 4x5 layout. See the screenshot from QMK configurator (or use it with the generated [JSON]()):
+This is a slight variation on the original Miryoku, adopted for Colemak and 4x5 layout. See the screenshot from [QMK configurator](https://config.qmk.fm/) (or use it with the generated [JSON](https://github.com/shybovycha/qmk_firmware/tree/my-skeletyl/keyboards/handwired/skeletyl/shybovycha_miryoku_4x5_qmk_conf.json)):
 
-![]
+![Screenshot](https://github.com/shybovycha/qmk_firmware/blob/b5b1e3ec72e115bddd862fd2854e272d5be956dd/keyboards/handwired/skeletyl/shybovycha_miryoku_4x5.png)
 
 ## Non-Pro Micro Controller Compilation
 
