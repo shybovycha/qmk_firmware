@@ -82,6 +82,12 @@ Variants with *Miryoku* support:
 - 4x6_5
 - 5x6
 
+### @shybovycha Miryoku
+
+This is a slight variation on the original Miryoku, adopted for Colemak and 4x5 layout. See the screenshot from QMK configurator (or use it with the generated [JSON]()):
+
+![]
+
 ## Non-Pro Micro Controller Compilation
 
 If building a Dactyl Manuform with controllers that aren't a pro micro, the Converter feature of QMK will allow compilation of firmware for the intended variant and supported controller without having to create a new QMK keyboard/keymap.  
